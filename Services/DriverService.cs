@@ -11,14 +11,9 @@ namespace Services
     public class DriverService : IDriverService
     {
         private ICommandService _commandService;
-        private IMapperService _mapperService;
-        public DriverService(
-            ICommandService commandService,
-            IMapperService mapperService
-        )
+        public DriverService(ICommandService commandService)
         {
             _commandService = commandService;
-            _mapperService = mapperService;
         }
 
         public List<Driver> GetDrivers()
@@ -27,8 +22,6 @@ namespace Services
             var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPSignedDriver");
 
             foreach (var obj in searcher.Get())
-            {
-
                 drivers.Add(new Driver()
                 {
                     DeviceName = obj["DeviceName"]?.ToString() ?? "",
@@ -39,21 +32,14 @@ namespace Services
                     InfName = obj["InfName"]?.ToString() ?? "",
                 });
 
-            }
 
             return drivers;
         }
 
-        public Driver? GetPS2KeyboardDriver()
-        {
-            var drivers = GetDrivers();
-
-            return drivers.FirstOrDefault(x => x.DeviceName.Contains("PS/2 Keyboard"));
-        }
-
         public void UninstallDriver(Driver driver)
         {
-            throw new NotImplementedException();
+            var output = _commandService.RunCommand($"pnputil /delete-driver {driver.InfName} /force");
+
         }
     }
 
