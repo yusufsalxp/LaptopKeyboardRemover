@@ -1,6 +1,5 @@
-using System.Diagnostics;
-using Autofac;
-using Services;
+using AutoMapper;
+using Models;
 using Services.Contracts;
 
 namespace LaptopKeyboardRemover;
@@ -15,6 +14,6 @@ static class Program
     {
         ContainerService.Start();
         ApplicationConfiguration.Initialize();
-        Application.Run(new Main());
+        Application.Run(ContainerService.Resolve<Main>());
     }
 }

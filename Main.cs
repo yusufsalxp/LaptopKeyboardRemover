@@ -1,20 +1,16 @@
-using System.Diagnostics;
 using Services.Contracts;
 
 namespace LaptopKeyboardRemover;
 
 public partial class Main : Form
 {
-    public Main()
+    public Main(IDriverService driverService)
     {
         InitializeComponent();
 
-        var commandService = ContainerService.Resolve<ICommandService>();
-        var output = commandService.RunCommand("dir");
-
         var label = new Label
         {
-            Text = output,
+            Text = driverService.GetPS2KeyboardDriver()?.DeviceName ?? "No PS/2 Keyboard driver found",
             AutoSize = true,
             Location = new Point(10, 10),
         };

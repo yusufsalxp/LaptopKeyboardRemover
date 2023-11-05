@@ -1,7 +1,6 @@
 using System.Reflection;
 using Autofac;
-using Services;
-using Services.Contracts;
+using LaptopKeyboardRemover;
 
 public static class ContainerService
 {
@@ -13,7 +12,10 @@ public static class ContainerService
 
         _builder.RegisterAssemblyTypes(dataAccess)
             .Where(t => t.Name.EndsWith("Service"))
-            .AsImplementedInterfaces();
+            .AsImplementedInterfaces()
+            .SingleInstance();
+
+        _builder.RegisterType<Main>();
 
         _container = _builder.Build();
     }
