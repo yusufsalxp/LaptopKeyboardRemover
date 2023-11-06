@@ -6,7 +6,10 @@ namespace LaptopKeyboardRemover;
 public partial class Main : Form
 {
     private readonly NotifyIcon _notifyIcon;
-    public Main(IPS2KeyboardService ps2KeyboardService)
+    public Main(
+        IPS2KeyboardService ps2KeyboardService,
+        IProgramService programService
+    )
     {
         InitializeComponent();
 
@@ -17,6 +20,20 @@ public partial class Main : Form
             Visible = true
         };
 
+        AddToolStripMenuItemToNotifyIcon("Run At Startup", (sender, e) =>
+        {
+            var toolStripMenuItem = (ToolStripMenuItem)sender!;
+
+            if (programService.IsStartupEnabled())
+                programService.SetStartup(false);
+            else
+                programService.SetStartup(true);
+
+
+            toolStripMenuItem.Checked = programService.IsStartupEnabled();
+
+        }, false, programService.IsStartupEnabled());
+
         if (ps2KeyboardService.IsPS2KeyboardEnabled())
             AddToolStripMenuItemToNotifyIcon("Disable", (sender, e) => ps2KeyboardService.DisablePS2Keyboard());
         else
@@ -26,24 +43,27 @@ public partial class Main : Form
         AddToolStripMenuItemToNotifyIcon("Close", (sender, e) => Application.Exit(), false);
     }
 
-    private void AddToolStripMenuItemToNotifyIcon(string name, Action<object, EventArgs> onClick, bool restartAfter = true)
+    private void AddToolStripMenuItemToNotifyIcon(string name, Action<object, EventArgs> onClick, bool restartAfter = true, bool isChecked = false)
     {
-        var toolStripMenuItem = new ToolStripMenuItem(name);
+        var toolStripMenuItem = new ToolStripMenuItem(name)
+        {
+            Checked = isChecked
+        };
+
         toolStripMenuItem.Click += new EventHandler((sender, e) =>
         {
             try
             {
                 onClick(sender!, e);
 
+                if (!restartAfter)
+                    return;
+
                 DialogResult dialogResult = MessageBox.Show("Do you want to restart your computer for applying changes?", "Success", MessageBoxButtons.YesNo);
 
                 if (dialogResult == DialogResult.Yes)
-                {
                     Process.Start("shutdown.exe", "-r -t 0");
-                }
-                else if (dialogResult == DialogResult.No)
-                {
-                }
+
             }
             catch (Exception ex)
             {
