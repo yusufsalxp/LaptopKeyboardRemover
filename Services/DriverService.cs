@@ -39,7 +39,10 @@ namespace Services
 
         public void UninstallDriver(Driver driver)
         {
-            var output = _commandService.RunCommand($"pnputil /delete-driver {driver.InfName} /force");
+            var output = _commandService.RunCommand($"pnputil /remove-device {driver.DeviceId}");
+
+            if (output.ToLower().Contains("error"))
+                throw new Exception("Error uninstalling driver");
 
         }
     }
