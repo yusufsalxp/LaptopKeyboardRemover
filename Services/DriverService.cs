@@ -29,8 +29,9 @@ namespace Services
                     DriverName = obj["DriverName"]?.ToString() ?? "",
                     DriverProviderName = obj["DriverProviderName"]?.ToString() ?? "",
                     DriverVersion = obj["DriverVersion"]?.ToString() ?? "",
-                    InfName = obj["InfName"]?.ToString() ?? "",
+                    InfName = obj["InfName"]?.ToString() ?? ""
                 });
+
 
 
             return drivers;

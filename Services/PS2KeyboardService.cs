@@ -19,7 +19,8 @@ namespace Services
 
         public void DisablePS2Keyboard()
         {
-            var output = _commandService.RunCommand("sc config i8042prt start= disabled");
+            var output = _commandService.RunCommand(CommandConstants.SetPS2KeyboardStartTypeToDisabled);
+
             var keyboard = GetPS2KeyboardDriver();
 
             if (keyboard != null)
@@ -28,7 +29,7 @@ namespace Services
 
         public void EnablePS2Keyboard()
         {
-            var output = _commandService.RunCommand("sc config i8042prt start= auto");
+            var output = _commandService.RunCommand(CommandConstants.SetPS2KeyboardStartTypeToAuto);
         }
 
         public Driver? GetPS2KeyboardDriver()
@@ -40,7 +41,13 @@ namespace Services
 
         public bool IsPS2KeyboardEnabled()
         {
-            throw new System.NotImplementedException();
+            var driver = GetPS2KeyboardDriver();
+            if (driver == null)
+                return false;
+
+            var output = _commandService.RunCommand(string.Format(CommandConstants.GetPS2KeyboardStatus, driver.DeviceName));
+
+            return output.Contains("OK");
         }
     }
 }
